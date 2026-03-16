@@ -1,29 +1,15 @@
 {
   stdenv,
-  autoPatchelfHook,
-  lib,
-  solana-cli,
   solana-platform-tools,
 }:
 stdenv.mkDerivation {
   pname = "solana-rust";
-  version = solana-cli.version;
-
-  phases = [ "installPhase" ];
-  nativeBuildInputs = [ autoPatchelfHook ];
-
-  buildInputs = [ solana-platform-tools ];
-
+  version = solana-platform-tools.platformTools.version;
+  dontUnpack = true;
   installPhase = ''
     mkdir -p $out/bin
-    rust=${solana-platform-tools}/bin/platform-tools-sdk/sbf/dependencies/platform-tools/rust/bin
-    ln -s $rust/cargo $out/bin/cargo
-    ln -s $rust/rustc $out/bin/rustc
+    for bin in cargo rustc; do
+      ln -s ${solana-platform-tools.platformTools}/rust/bin/$bin $out/bin/$bin
+    done
   '';
-
-  meta = with lib; {
-    description = "Solana SDK";
-    homepage = "https://solana.com";
-    platforms = platforms.unix;
-  };
 }
